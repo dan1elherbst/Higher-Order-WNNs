@@ -1,0 +1,9 @@
+# macOS
+*.DS_Store
+
+# Python/Jupyter
+*.ipynb_checkpoints
+__pycache__/
+
+# Artifacts
+*.zip
