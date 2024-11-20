@@ -1,4 +1,5 @@
-import numpy as np
+from typing import Callable
+
 import torch
 import torch.nn as nn
 from torch_geometric.utils import to_dense_adj
@@ -8,11 +9,11 @@ class IWN2(torch.nn.Module):
 
     def __init__(
             self,
-            in_channels,
-            hidden_channels,
-            num_layers=2,
-            activation=torch.sigmoid,
-        ):
+            in_channels: int,
+            hidden_channels: int,
+            num_layers: int = 2,
+            activation: Callable = torch.sigmoid,
+        ) -> None:
         super(IWN2, self).__init__()
         self.activation = activation
         self.num_layers = num_layers
@@ -22,7 +23,11 @@ class IWN2(torch.nn.Module):
             for _ in range(num_layers - 1)]
         )
 
-    def forward(self, x, edge_index, edge_weight, batch):
+    def forward(self,
+                x: torch.Tensor,
+                edge_index: torch.Tensor,
+                edge_weight: torch.Tensor,
+                batch: torch.Tensor) -> torch.Tensor:
         x_2d_A = self.to_dense_adj_and_signal(
             x, edge_index, edge_weight, batch)
         for i, layer in enumerate(self.layers):
@@ -31,7 +36,11 @@ class IWN2(torch.nn.Module):
                 x_2d_A = self.activation(x_2d_A)
         return x_2d_A.mean([1, 2, 3])
 
-    def to_dense_adj_and_signal(self, x, edge_index, edge_weight, batch):
+    def to_dense_adj_and_signal(self,
+                                x: torch.Tensor,
+                                edge_index: torch.Tensor,
+                                edge_weight: torch.Tensor,
+                                batch: torch.Tensor) -> torch.Tensor:
         A = to_dense_adj(edge_index, batch=batch, edge_attr=edge_weight)
         num_nodes_per_graph = A.size(-1)
         feature_dim = x.size(-1)
@@ -53,11 +62,11 @@ class IWN2Layer(nn.Module):
 
     def __init__(
         self,
-        in_channels,
-        out_channels,
-        normalization=True,
-        device='cpu',
-    ):
+        in_channels: int,
+        out_channels: int,
+        normalization: bool = True,
+        device: str = 'cpu',
+    ) -> None:
         super(IWN2Layer, self).__init__()
 
         self.in_channels = in_channels
@@ -74,7 +83,7 @@ class IWN2Layer(nn.Module):
             torch.zeros(1, self.out_channels, 1, 1)
         ).to(device = self.device)
 
-    def forward(self, x_2d_A):
+    def forward(self, x_2d_A: torch.Tensor) -> torch.Tensor:
 
         ops_out = self.operators_2_to_2(x_2d_A)
         ops_out = torch.stack(ops_out, dim=2)
@@ -84,7 +93,7 @@ class IWN2Layer(nn.Module):
 
         return output
 
-    def operators_2_to_2(self, x_2d_A):
+    def operators_2_to_2(self, x_2d_A: torch.Tensor) -> torch.Tensor:
         """
         ij->ik
         ij->jk

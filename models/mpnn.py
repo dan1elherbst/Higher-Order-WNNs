@@ -1,3 +1,5 @@
+from typing import Callable
+
 import torch
 from torch_geometric.nn import MessagePassing, global_mean_pool
 
@@ -6,11 +8,11 @@ class MPNN(torch.nn.Module):
 
     def __init__(
             self,
-            in_channels,
-            hidden_channels,
-            num_layers=2,
-            activation=torch.sigmoid,
-        ):
+            in_channels: int,
+            hidden_channels: int,
+            num_layers: int = 2,
+            activation: Callable = torch.sigmoid,
+        ) -> None:
         super(MPNN, self).__init__()
         self.activation = activation
         self.layers = (
@@ -20,7 +22,11 @@ class MPNN(torch.nn.Module):
             [MPNNLayer(hidden_channels, 1)]
         )
 
-    def forward(self, x, edge_index, edge_weight, batch):
+    def forward(self,
+                x: torch.Tensor,
+                edge_index: torch.Tensor,
+                edge_weight: torch.Tensor,
+                batch: torch.Tensor) -> torch.Tensor:
         for layer in self.layers[:-1]:
             x = layer(x, edge_index, edge_weight, batch)
             x = self.activation(x)
@@ -31,7 +37,7 @@ class MPNN(torch.nn.Module):
 
 class MPNNLayer(MessagePassing):
 
-    def __init__(self, in_channels, out_channels):
+    def __init__(self, in_channels: int, out_channels: int) -> None:
         super(MPNNLayer, self).__init__(aggr='add')
         self.linear = torch.nn.Linear(in_channels, out_channels)
         # TODO: Maybe change initialization!
@@ -39,7 +45,11 @@ class MPNNLayer(MessagePassing):
         if self.linear.bias is not None:
             torch.nn.init.zeros_(self.linear.bias)
 
-    def forward(self, x, edge_index, edge_weight, batch):
+    def forward(self,
+                x: torch.Tensor,
+                edge_index: torch.Tensor,
+                edge_weight: torch.Tensor,
+                batch: torch.Tensor) -> torch.Tensor:
         num_nodes_per_graph = torch.bincount(batch).float()
         num_nodes_for_each_node = num_nodes_per_graph[batch]
         out = self.propagate(edge_index, x=x, edge_weight=edge_weight)
