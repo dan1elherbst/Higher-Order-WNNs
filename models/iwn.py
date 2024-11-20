@@ -67,8 +67,7 @@ class IWN2Layer(nn.Module):
         self.basis_dim = 7
 
         self.coeffs = torch.nn.Parameter(
-            torch.randn(self.in_channels, self.out_channels, self.basis_dim) * \
-            np.sqrt(2.0) / (self.in_channels + self.out_channels),
+            torch.randn(self.in_channels, self.out_channels, self.basis_dim),
             requires_grad=True,
         ).to(device = self.device)
         self.bias = torch.nn.Parameter(
