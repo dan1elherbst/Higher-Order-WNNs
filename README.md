@@ -1,4 +1,3 @@
-# Invariant Graphon Networks: Approximation and Cut Distance
+# Higher-Order Graphon Networks: Approximation and Cut Distance
 
-This repository contains the code used for the paper currently under review at
-ICLR 2025.
+This repository contains the code used for ICLR 2025 paper.
