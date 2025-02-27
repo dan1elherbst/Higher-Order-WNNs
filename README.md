@@ -1,3 +1,3 @@
 # Higher-Order Graphon Networks: Approximation and Cut Distance
 
-This repository contains the code used for ICLR 2025 paper.
+This repository hosts the code for the ICLR 2025 paper.
